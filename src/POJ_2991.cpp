@@ -30,41 +30,61 @@ using namespace std;
 #define FIT(it,v) for (typeof((v).begin()) it = (v).begin(); it != (v).end(); it++)
 #define OUT(A) cout << #A << " = "<< (A) << endl
 
-#define M_PI_ 3.1416926535
+#define M_PI_ 3.1415926535
 
 int n, c;
-int L[10010], s[10010], a[10010], prev[10010];
+int L[10010], s[10010], a[10010];
+int prev[10010];
+double x[40040], y[40040];
+double arg[40040];
+
+void init(int _n, int l, int r){
+	x[_n] = 0;
+	if(r-l == 1){
+		y[_n] = L[l];
+		arg[_n] = -10000.0; // 葉なので使用しない値
+	}
+	else{
+		int m = (l+r)/2;
+		init(_n*2+1, l, m);
+		init(_n*2+2, m, r);
+		y[_n] = y[_n*2+1] + y[_n*2+2];
+		arg[_n] = 0.0;
+	}
+	return;
+}
+
+void change(int point, double ar, int node, int l, int r){
+	if(r-l == 1) return;
+	if(point <= l || point >= r) return;
+	int m = (l+r)/2;
+	int chl = node*2+1;
+	int chr = node*2+2;
+	change(point, ar, chl, l, m);
+	change(point, ar, chr, m, r);
+	if(point <= m) arg[node] += ar;
+	x[node] = x[chl] + x[chr]*cos(arg[node]) - y[chr]*sin(arg[node]);
+	y[node] = y[chl] + x[chr]*sin(arg[node]) + y[chr]*cos(arg[node]);
+	return;
+}
 
 void run(){
-	double x[10010], y[10010];
-	REP(i, n){
-		x[i+1] = 0;
-		y[i+1] = y[i] + L[i];
-		if(i>=1) prev[i] = 180;
-	}
+	init(0, 0, n);
+	for(int i=1; i<n; i++) prev[i] = 180;
 	REP(i, c){
-		double px, py;
-		px = x[s[i]]; py = y[s[i]];
-		double ka = (double)(a[i]-prev[s[i]])/360*2*M_PI_;
+		double ar = (double)(a[i]-prev[s[i]])/360*2*M_PI_;
+		change(s[i], ar, 0, 0, n);
 		prev[s[i]] = a[i];
-		for(int j=s[i]+1; j<=n; j++){
-			double a, b;
-			a = x[j]-px; b = y[j]-py;
-			double aa = a*cos(ka) - b*sin(ka);
-			double bb = a*sin(ka) + b*cos(ka);
-			x[j] = px+aa; y[j] = py+bb;
-		}
-		printf("%.2f %.2f\n", x[n], y[n]);
+		printf("%.2f %.2f\n", x[0], y[0]);
 	}
-	
 }
 
 int main() {
 	scanf("%d", &n);
 	while(1){
-		fill(L, L+10010, 0);
-		fill(s, s+10010, 0);
-		fill(a, a+10010, 0);
+		fill(L, L+10005, 0);
+		fill(s, s+10005, 0);
+		fill(a, a+10005, 0);
 		scanf("%d", &c);
 		REP(i, n) scanf("%d", &L[i]);
 		REP(i, c) scanf("%d %d", &s[i], &a[i]);
