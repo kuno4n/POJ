@@ -35,24 +35,50 @@ LL A[100010];
 LL all[400040], part[400040];
 char ch;
 
+void add(int A, int B, int x, int node, int left, int right){
+	if(right<=left) return;
+    if(A<=left && right<=B){
+		all[node] += x;
+		return;
+	}
+	if(!(right<=A) && !(B<=left)) part[node] += x * (min(right,B) - max(left, A));
+	else return;
+
+	int m = (left+right)/2;
+	add(A, B, x, node*2+1, left, m);
+	add(A, B, x, node*2+2, m, right);
+
+    return;
+}
+
+LL sum(int A, int B, int node, int left, int right){
+    LL res = 0;
+	if(right<=left) return res;
+	if(A<=left && right<=B){
+		res += part[node];
+		res += all[node] * (right-left);
+		return res;
+	}
+	if(!(right<=A) && !(B<=left)) res += all[node] *(min(right,B) - max(left, A));
+	else return res;
+
+	int m = (left+right)/2;
+	res += sum(A, B, node*2+1, left, m);
+	res += sum(A, B, node*2+2, m, right);
+
+    return res;
+}
+
 void init(){
-    
-    return;
-}
-
-void add(){
-    
-    return;
-}
-
-void sum(){
-    
+	REP(i, 400040) all[i] = 0;
+	REP(i, 400040) part[i] = 0;
+    REP(i, N) add(i, i+1, A[i], 0, 0, N);
     return;
 }
 
 int main() {
     cin >> N >> Q;
-    REP(i, N) scanf("%d", &A[i]);
+    REP(i, N) scanf("%lld", &A[i]);
     init();
     REP(i, Q){
         cin >> ch;
@@ -64,12 +90,9 @@ int main() {
         else{
             cin >> a >> b;
             a--; b--;
-            sum(a, b+1, 0, 0, N);
+            cout << sum(a, b+1, 0, 0, N) << endl; 
         }
     }
     
     return 0;
 }
-
-
-
