@@ -14,7 +14,7 @@
 #include <stack>
 #include <queue>
 #include <numeric>
-#include "cout.h"
+//#include "cout.h"
 
 using namespace std;
 
@@ -31,7 +31,7 @@ using namespace std;
 #define OUT(A) cout << #A << " = "<< (A) << endl
 
 int n, m, I, J, K;
-int a[100010];
+LL a[100010];
 VI dat[400040];
 
 void init(int node, int L, int R){
@@ -43,25 +43,40 @@ void init(int node, int L, int R){
 	init(node*2+1, L, m);
 	init(node*2+2, m, R);
 
-	dat[node].resize(SZ(dat[node*2+1])+SZ(dat[node*2+2]));
+	dat[node].resize(R-L);
 	merge(ALL(dat[node*2+1]), ALL(dat[node*2+2]), dat[node].begin());
 	return;
 }
 
 int calc(int A, int B, int x, int node, int L, int R){
-	if(
+	if(R<=A || B<=L) return 0;
+    if(A<=L && R<=B) return upper_bound(ALL(dat[node]), x) - dat[node].begin();
+    int mid = (L+R)/2;
+    return calc(A, B, x, node*2+1, L, mid) + calc(A, B, x, node*2+2, mid, R);
 }
 
 int main() {
     cin >> n >> m;
-	REP(i, n) scanf("%d", &a[i]);
+	REP(i, n) scanf("%lld", &a[i]);
 	REP(i, 400040) dat[i].clear();
 	init(0, 0, n);
+    sort(a, a+n);
 
 	REP(i, m){
 		scanf("%d %d %d", &I, &J, &K);
-		I--; J--;
-		printf("%d\n", calc(I, J, K, 0, 0, n));
+		I--;
+        int lo = -1;
+        int hi = n-1;
+        while(hi-lo > 1){
+            int mid = (lo+hi)/2;
+            int tmp = calc(I, J, a[mid], 0, 0, n);
+            if(tmp >= K) hi = mid;
+            else lo = mid;
+        }
+		printf("%lld\n", a[hi]);
 	}
     return 0;
 }
+
+
+
