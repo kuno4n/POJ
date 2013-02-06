@@ -65,16 +65,18 @@ int main() {
 	REP(i, m){
 		scanf("%d %d %d", &I, &J, &K);
 		I--;
-        int lo = -1;
-        int hi = n-1;
+        LL lo = -1000000001;
+        LL hi = 1000000000;
         while(hi-lo > 1){
             int mid = (lo+hi)/2;
-            int tmp = calc(I, J, a[mid], 0, 0, n);
+            int tmp = calc(I, J, mid, 0, 0, n);
             if(tmp >= K) hi = mid;
             else lo = mid;
         }
-		printf("%lld\n", a[hi]);
+		printf("%lld\n", hi);
 	}
+    int g = 1000000000
+    OUT(g);
     return 0;
 }
 
