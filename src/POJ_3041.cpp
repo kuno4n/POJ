@@ -68,14 +68,15 @@ int bipartite_matching(){
 
 int main() {
     cin >> V;
-    V *= 2;
+//    V *= 2;
     int k;
     cin >> k;
     REP(i, k){
         int u, v;
         cin >> u >> v;
         u--; v--;
-        v += (V/2);
+//        v += (V/2);
+        v += V;
         add_edge(u, v);
     }
     cout << bipartite_matching() << endl;
