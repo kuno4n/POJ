@@ -37,23 +37,8 @@ using namespace std;
 #define cpresent(c, e) (find(all(c), (e)) != (c).end())
 
 
-LL dp[13][1<<11];
+LL crt[1<<11], nxt[1<<11];
 int h, w;
-
-bool can(int a, int b){
-	bool res = true;
-	int c = a|b;
-	if(c != (a^b)) res = false;
-	int ren = 0;
-	REP(j, w+1){
-		if(j == w || (c&(1<<j))){
-			if(ren&1) res = false;
-			ren = 0;
-		}
-		else ren++;
-	}
-	return res;
-}
 
 void init() {
 }
@@ -62,16 +47,23 @@ void input() {
 }
 
 void solve() {
-	if((w&1) && (h&1)){
-		cout << 0 << endl;
-		return;
+	REP(i, (1<<w)) crt[i] = 0;
+	crt[0] = 1;
+	
+	REP(i, h) REP(j, w){
+		REP(k, (1<<w)) nxt[k] = 0;
+		REP(k, (1<<w)) if(crt[k] > 0) {			
+			//tate
+			if(!(k & 1) && (i < h-1)) nxt[(k>>1)|(1<<(w-1))] += crt[k];
+			//yoko
+			if(!(k & 3) && (j < w-1)) nxt[(k>>1)|1] += crt[k];
+			//nashi 
+			if(k & 1) nxt[k>>1] += crt[k];
+		}
+		swap(crt, nxt);
 	}
-	REP(i, h+1) REP(j, (1<<w)) dp[i][j] = 0;
-	dp[0][0] = 1;
-	REP(i, h+1) REP(j, (1<<w)) if(dp[i][j] > 0){
-		REP(k, (1<<w)) if(can(j, k)) dp[i+1][k] += dp[i][j];
-	}
-	cout << dp[h][0] << endl;
+	
+	cout << crt[0] << endl;
 }
 
 int main() {
@@ -79,7 +71,6 @@ int main() {
     input();
     while(cin >> h >> w){
 		if(h == 0) break;
-		if(w > h) swap(w, h);
 		solve();
 	}
 	return 0;
